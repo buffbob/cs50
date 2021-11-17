@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Posts</title>
+
+    <style>
+
+        @keyframes hide {
+            0% {
+                opacity:1;
+                height:100%;
+                line-height: 100%;
+                padding: 20px;
+                margin-bottom: 10px;
+            }
+            75% {
+                opacity: 0;
+                line-height: 100%;
+                padding: 20px;
+                margin-bottom: 10px;
+
+            }
+            100% {
+                opacity:0;
+                height:0px;
+                line-height: 0px;
+                padding: 0px;
+                margin-bottom: 0px;
+            }
+            
+        }
+
+        .post {
+            background-color: green;
+            margin-bottom: 10px;
+            padding: 20px;
+            animation-name: hide;
+            animation-duration: 2s;
+            animation-fill-mode: forwards;
+            animation-play-state: paused;
+        }
+        .hide {
+            float: right;
+            background-color:yellow;
+            
+        }
+    </style>
+
+    <script>
+        let counter = 1;
+        let quantity = 20;
+        document.addEventListener("DOMContentLoaded", load);
+
+        window.onscroll = () => {
+            if (window.scrollY + window.innerHeight >= document.body.offsetHeight){
+                load();
+            }
+        }
+        
+        document.addEventListener("click", e => {
+            const element = e.target;
+            if (element.className === "hide"){
+                // element.parentElement.remove();
+                element.parentElement.style.animationPlayState='running';
+                element.parentElement.addEventListener('animationend', () => {
+                    element.parentElement.remove();
+                })
+            }
+
+        });
+
+        function load() { 
+            const start = counter;
+            const end = start + quantity - 1;
+            counter = end + 1;
+
+            fetch(`/one/posts?start=${start}&end=${end}`)
+            .then(response => response.json())
+            .then(data =>{
+                data.data.forEach(add_post);
+            })
+        };
+
+        function add_post(content) {
+            const post = document.createElement('div');
+            post.className = 'post';
+            // post.innerHTML = content;
+            post.innerHTML = `${content} <button class='hide'>Hide</button>`;
+            document.querySelector("#posts").append(post);
+        };
+    </script>
+</head>
+<body>
+<h1>Here are your posts</h1>
+<div id="posts"></div>
+</body>
+</html>
